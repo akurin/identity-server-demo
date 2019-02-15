@@ -11,21 +11,41 @@ namespace IdentityServer
 {
     public class Startup
     {
-        public void ConfigureServices(IServiceCollection services)
+        private readonly IHostingEnvironment _environment;
+
+        public Startup(IHostingEnvironment environment)
         {
+            _environment = environment ?? throw new ArgumentNullException(nameof(environment));
         }
 
-        public void Configure(IApplicationBuilder app, IHostingEnvironment env)
+        public void ConfigureServices(IServiceCollection services)
         {
-            if (env.IsDevelopment())
+            var identityServerBuilder = services
+                .AddIdentityServer()
+                .AddInMemoryIdentityResources(Config.GetIdentityResources())
+                .AddInMemoryApiResources(Config.GetApis())
+                .AddInMemoryClients(Config.GetClients());
+
+            if (_environment.IsDevelopment())
+            {
+                identityServerBuilder.AddDeveloperSigningCredential();
+            }
+            else
+            {
+                throw new Exception("need to configure key material");
+            }
+        }
+
+        public void Configure(IApplicationBuilder app)
+        {
+            if (_environment.IsDevelopment())
             {
                 app.UseDeveloperExceptionPage();
             }
 
-            app.Run(async (context) =>
-            {
-                await context.Response.WriteAsync("Hello World!");
-            });
+            app.UseIdentityServer();
+
+            app.Run(async (context) => { await context.Response.WriteAsync("Hello World!"); });
         }
     }
 }
