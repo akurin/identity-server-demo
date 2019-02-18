@@ -64,14 +64,14 @@ namespace IdentityServerAspNetIdentity
                 {
                     ClientId = "mvc",
                     ClientName = "MVC Client",
-                    AllowedGrantTypes = GrantTypes.Hybrid,
+                    AllowedGrantTypes = GrantTypes.Implicit,
 
                     ClientSecrets =
                     {
                         new Secret("secret".Sha256())
                     },
 
-                    RedirectUris           = { "http://localhost:5002/signin-oidc" },
+                    RedirectUris           = { "http://localhost:6001/signin-oidc" },
                     PostLogoutRedirectUris = { "http://localhost:5002/signout-callback-oidc" },
 
                     AllowedScopes =
